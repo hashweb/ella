@@ -1,0 +1,11 @@
+{
+  "irc": {
+    "host": "chat.freenode.net",
+    "port": 6667,
+    "user": "ella-development",
+    "nick": "ella-dev",
+    "channels": [
+      "web-testing"
+    ]
+  }
+}
