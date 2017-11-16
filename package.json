@@ -1,0 +1,11 @@
+{
+  "name": "Ella",
+  "version": "0.1.0",
+  "description": "State of the art IRC bot library & bot for Node.js",
+  "main": "index.js",
+  "author": "Jason Williams",
+  "license": "MIT",
+  "dependencies": {
+    "irc-framework": "^2.9.1"
+  }
+}
