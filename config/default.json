@@ -7,5 +7,20 @@
     "channels": [
       "web-testing"
     ]
-  }
+  },
+  "googleSearch": {
+    "cx": "",
+    "key": "",
+    "url": "https://www.googleapis.com/customsearch/v1",
+    "status": false
+  },
+  "logging": {
+    "filename": "error.log",
+    "level": "error"
+  },
+  "hashwebApi": {
+    "url": "https://hashweb.org/api/",
+    "status": true
+  },
+  "adminUsers": []
 }

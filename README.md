@@ -19,7 +19,13 @@ Here are our reasons for building a new bot:
 
 ## Commands
 
-There are currently no commands, this is a brand new bot
+All commands begin with a `!`, e.g `!ping`
+
+* `ping` - Ella will respond with a pong!
+* `lucky [search Q] ` - Ella will do a google search based on this query
+* `seen` - Get the last time a user was seen
+* `fseen` - Get the first time a user was seen
+* `help` - Find out more about Ella and her commands
 
 ## Development
 You will need Docker installed.

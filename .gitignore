@@ -1,4 +1,9 @@
 coverage/
 node_modules/
+config/production.json
+error.log
+combined.log
+
+
 *.sublime-project
 *.sublime-workspace
