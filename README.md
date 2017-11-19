@@ -26,6 +26,7 @@ All commands begin with a `!`, e.g `!ping`
 * `seen [user]` - Get the last time a user was seen
 * `fseen [user]` - Get the first time a user was seen
 * `stats [user]` - Get stats on a user
+* `js [expression]` - Run JS in the sandbox and get results
 * `help` - Find out more about Ella and her commands
 
 ## Development

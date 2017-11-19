@@ -3,6 +3,7 @@ const config = require('config');
 const request = require('request');
 const package = require('./package.json');
 const cheerio = require('cheerio');
+const {VM} = require('vm2');
 
 // Lib Modules
 const Karma = require('./lib/karma');
@@ -54,6 +55,9 @@ bot.on('message', function(event) {
         case 'karma':
           giveKarma(command[1], event);
           break;
+        case 'js':
+          let expr = command.splice(1).join(' ');
+          js(expr, event);
       }
     }
 });
@@ -90,6 +94,23 @@ bot.on('privmsg', function(event) {
       }
   }
 })
+
+function js(expression, event) {
+  // A new VM needs to be created each time, otherwise variables/state will be left over from previous command
+  const vm = new VM({
+    timeout: 2000
+  });
+  try {
+    // run expression inside a safe sandbox;
+    let result = vm.run(expression);
+    // result can sometimes be undefined if nothing was returned
+    if (result) {
+      event.reply(`${event.nick}: ${result}`);
+    }
+  } catch(e) {
+    logger.error(e.message);
+  }
+}
 
 /**
  * Give karma to another user.
