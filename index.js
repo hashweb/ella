@@ -91,34 +91,51 @@ bot.on('privmsg', function(event) {
   }
 })
 
-function giveKarma(user, event) {
-  karma.giveKarma(event, user).then(body => {
-    console.log(body);
-    event.reply(`${event.nick}: ${body}`);
-  }, err => {
+/**
+ * Give karma to another user.
+ * @param {string} user
+ * @param {object} event - IRC.
+ * @return {Promise}
+ */
+async function giveKarma(user, event) {
+  try {
+    let response = await karma.giveKarma(event, user);
+    event.reply(`${event.nick}: ${response}`);
+  } catch(err) {
     logger.error(err);
-  })
+  }
 }
 
-function stats(user, event) {
-  hashweb.stats(user).then(res => {
+/**
+ * Get stats on a user.
+ * @param {string} user
+ * @param {object} event - IRC.
+ * @return {Promise}
+ */
+async function stats(user, event) {
+  try {
+    let res = await hashweb.stats(user);
     event.reply(`${event.nick}: ${res}`);
-  }, err => {
-    if (err.message === "User not found") {
+  } catch(err) {
+      if (err.message === "User not found") {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
-      return
+      logger.error(err.message);
     }
-    logger.error(err);
-  })
+  }
 }
 
+/**
+ * Get Help on the bot!
+ * @param {object} event - IRC.
+ * @return {Promise}
+ */
 function help(event) {
   event.reply(`${event.nick} you can find out more about me here - ${package.repository.url}`);
 }
+
 /**
  * Return a pong.
  * @param {object} event - IRC.
- * @return {string} The blended color.
  */
 function ping(event) {
   event.reply(`${event.nick} Pong`);
