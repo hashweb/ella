@@ -2,12 +2,15 @@ const IRC = require('irc-framework');
 const config = require('config');
 const request = require('request');
 const package = require('./package.json');
+const cheerio = require('cheerio');
 
 // Lib Modules
+const Karma = require('./lib/karma');
 const logger = require('./lib/logger');
 const hashweb = require('./lib/hashweb');
 const googleSearch = require('./lib/googleSearch');
 
+let karma = new Karma();
 let bot = new IRC.Client();
 
 bot.connect({
@@ -16,9 +19,11 @@ bot.connect({
 })
 
 bot.on('registered', function() {
+  console.log('Connected');
   bot.join('#web-testing');
-  hashweb.checkBans(bot);
 });
+
+let urlRegex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
 
 bot.on('message', function(event) {
     // if the first character is a !, lets jump into command mode
@@ -46,8 +51,29 @@ bot.on('message', function(event) {
         case 'stats':
           stats(command[1], event);
           break;
+        case 'karma':
+          giveKarma(command[1], event);
+          break;
       }
     }
+});
+
+//  Capture links being posted in the chat and show the titles
+bot.on("message", function(event) {
+  let msg = event.message;
+  /* request only deals with urls which begin with http(s) */
+  if (msg.match(urlRegex) && msg.match(/^http[s]?/)) {
+    /* Make request to URl and get the title */
+    var url = msg.match(urlRegex)[0];
+    request(url, function(error, response, body) {
+      if (!error && response.statusCode == 200) {
+        var $ = cheerio.load(body);
+        var title = $("title").text().trim().replace(/\r?\n/, " ");
+        if (title) event.reply("Title: " + title); // Don't bother showing a title if its empty
+      }
+    });
+
+  };
 });
 
 bot.on('privmsg', function(event) {
@@ -65,7 +91,7 @@ bot.on('privmsg', function(event) {
   }
 })
 
-function stats(user, event) {
+function giveKarma(user, event) {
 
 }
 
