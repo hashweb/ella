@@ -17,53 +17,61 @@ let bot = new IRC.Client();
 bot.connect({
   host: config.get('irc.host'),
   nick: config.get('irc.nick')
-})
+});
 
 bot.on('registered', function() {
-  console.log('Connected');
+  logger.info('Connected');
   bot.join('#web-testing');
 });
 
-let urlRegex = new RegExp("^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_\+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?");
+let urlRegex = new RegExp('^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?');
 
 bot.on('message', function(event) {
-    // if the first character is a !, lets jump into command mode
-    if (event.message.indexOf('!') === 0) {
-      let command = event.message.toLowerCase().replace('!', '').split(' ');
-      // Go through available options
-      switch(command[0]) {
-        case 'ping':
-          ping(event);
-          break;
-        case 'g':
-          // concatenate the remaining search terms into a single string
-          let query = command.splice(1).join(' ');
-          searchGoogle(query, event);
-          break;
-        case 'seen':
-          seen(command[1], event);
-          break;
-        case 'fseen':
-          fseen(command[1], event);
-          break;
-        case 'help':
-          help(event);
-          break;
-        case 'stats':
-          stats(command[1], event);
-          break;
-        case 'karma':
-          giveKarma(command[1], event);
-          break;
-        case 'js':
-          let expr = command.splice(1).join(' ');
-          js(expr, event);
-      }
+  // if the first character is a !, lets jump into command mode
+  if (event.message.indexOf('!') === 0) {
+    let command = event.message.toLowerCase().replace('!', '').split(' ');
+    // Go through available options
+    switch(command[0]) {
+    case 'ping':
+      ping(event);
+      break;
+    case 'g': {
+      // concatenate the remaining search terms into a single string
+      let query = command.splice(1).join(' ');
+      searchGoogle(query, event);
+      break;
     }
+    case 'seen':
+      seen(command[1], event);
+      break;
+    case 'fseen':
+      fseen(command[1], event);
+      break;
+    case 'help':
+      help(event);
+      break;
+    case 'stats':
+      stats(command[1], event);
+      break;
+    case 'ops':
+      ops(event);
+    case 'karma':
+      giveKarma(command[1], event);
+      break;
+    case 'js': {
+      let expr = command.splice(1).join(' ');
+      js(expr, event);
+    }
+    }
+  }
 });
 
+bot.on('debug', function(event) {
+  logger.info(event);
+})
+
 //  Capture links being posted in the chat and show the titles
-bot.on("message", function(event) {
+bot.on('message', function(event) {
   let msg = event.message;
   /* request only deals with urls which begin with http(s) */
   if (msg.match(urlRegex) && msg.match(/^http[s]?/)) {
@@ -72,28 +80,41 @@ bot.on("message", function(event) {
     request(url, function(error, response, body) {
       if (!error && response.statusCode == 200) {
         var $ = cheerio.load(body);
-        var title = $("title").text().trim().replace(/\r?\n/, " ");
-        if (title) event.reply("Title: " + title); // Don't bother showing a title if its empty
+        var title = $('title').text().trim().replace(/\r?\n/, ' ');
+        if (title) event.reply('Title: ' + title); // Don't bother showing a title if its empty
       }
     });
 
-  };
+  }
 });
 
 bot.on('privmsg', function(event) {
   let text = event.message;
-  let channel = text.match(/^(\#[a-zA-Z0-9-]+)/);
+  let channel = text.match(/^(#[a-zA-Z0-9-]+)/)[0];
   let adminUsers = config.get('adminUsers');
   for (var i=0;i < adminUsers.length ; i++) {
-      /* Check the config if its a valid user */
-      if (adminUsers[i].host === event.hostname && channel) {
-          let chanObj = bot.channel(channel);
-          text = text.replace(/^(\#[a-zA-Z0-9-]+) /, "");
-          chanObj.say(text.trim());
-
-      }
+    /* Check the config if its a valid user */
+    if (adminUsers[i].host === event.hostname && channel) {
+      let chanObj = bot.channel(channel);
+      text = text.replace(/^(#[a-zA-Z0-9-]+) /, '');
+      chanObj.say(text.trim());
+    }
   }
-})
+});
+
+/**
+ * Call Ops.
+ * @param {object} event - IRC.
+ */
+function ops(event) {
+  let adminUsers = config.get('adminUsers');
+  let users = ""
+  adminUsers.forEach(v => {
+    users += v.name + ' ';
+  })
+
+  event.reply(`${users}`);
+}
 
 function js(expression, event) {
   // A new VM needs to be created each time, otherwise variables/state will be left over from previous command
@@ -138,7 +159,7 @@ async function stats(user, event) {
     let res = await hashweb.stats(user);
     event.reply(`${event.nick}: ${res}`);
   } catch(err) {
-      if (err.message === "User not found") {
+    if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
       logger.error(err.message);
     }
@@ -168,11 +189,11 @@ function ping(event) {
  * @param {event} ircEevnt - The event object passed through
  */
 function searchGoogle(cmd, event) {
-   googleSearch(cmd).then((response) => {
+  googleSearch(cmd).then((response) => {
     event.reply(`${event.nick}: ${response.title} - ${response.link}`);
-   }, (err) => {
+  }, (err) => {
     logger.error(err.toString());
-   })
+  });
 }
 
 /**
@@ -184,12 +205,12 @@ function seen(user, event) {
   hashweb.seen(user).then(res => {
     event.reply(`${event.nick}: ${res}`);
   }, err => {
-    if (err.message === "User not found") {
+    if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
-      return
+      return;
     }
     logger.error(err);
-  })
+  });
 }
 
 /**
@@ -201,10 +222,10 @@ function fseen(user, event) {
   hashweb.fseen(user).then(res => {
     event.reply(`${event.nick}: ${res}`);
   }, err => {
-    if (err.message === "User not found") {
+    if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
-      return
+      return;
     }
     logger.error(err);
-  })
+  });
 }

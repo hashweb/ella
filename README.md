@@ -27,7 +27,12 @@ All commands begin with a `!`, e.g `!ping`
 * `fseen [user]` - Get the first time a user was seen
 * `stats [user]` - Get stats on a user
 * `js [expression]` - Run JS in the sandbox and get results
+* `ops` - Call the operators of the channel
 * `help` - Find out more about Ella and her commands
+
+### Op Commands
+Ops can message Ella with [channel] [message] and she will send that message to that channel, e.g
+`/msg ella #web Hello`
 
 ## Development
 You will need Docker installed.
