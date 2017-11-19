@@ -34,7 +34,7 @@ bot.on('message', function(event) {
         case 'ping':
           ping(event);
           break;
-        case 'lucky':
+        case 'g':
           // concatenate the remaining search terms into a single string
           let query = command.splice(1).join(' ');
           searchGoogle(query, event);
@@ -92,7 +92,24 @@ bot.on('privmsg', function(event) {
 })
 
 function giveKarma(user, event) {
+  karma.giveKarma(event, user).then(body => {
+    console.log(body);
+    event.reply(`${event.nick}: ${body}`);
+  }, err => {
+    logger.error(err);
+  })
+}
 
+function stats(user, event) {
+  hashweb.stats(user).then(res => {
+    event.reply(`${event.nick}: ${res}`);
+  }, err => {
+    if (err.message === "User not found") {
+      event.reply(`sorry ${event.nick}: I can't find that user :(`);
+      return
+    }
+    logger.error(err);
+  })
 }
 
 function help(event) {
