@@ -16,12 +16,18 @@ let bot = new IRC.Client();
 
 bot.connect({
   host: config.get('irc.host'),
-  nick: config.get('irc.nick')
+  nick: config.get('irc.nick'),
+  username: config.get('irc.nick')
 });
 
 bot.on('registered', function() {
   logger.info('Connected');
-  bot.join('#web-testing');
+  bot.say('nickserv', 'identify ' + config.get('irc.nick') + ' ' + config.get('irc.password'));
+
+  let channels = config.get('irc.channels');
+  channels.forEach(v => {
+    bot.join(v);
+  });
 });
 
 let urlRegex = new RegExp('^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?');
