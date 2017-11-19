@@ -96,7 +96,12 @@ bot.on('message', function(event) {
 
 bot.on('privmsg', function(event) {
   let text = event.message;
-  let channel = text.match(/^(#[a-zA-Z0-9-]+)/)[0];
+  let channel = text.match(/^(#[a-zA-Z0-9-]+)/);
+  // for some reason public messages fall into privmsg too, so check for channel
+  if (channel)
+    channel = channel[0];
+  else
+    return;
   let adminUsers = config.get('adminUsers');
   for (var i=0;i < adminUsers.length ; i++) {
     /* Check the config if its a valid user */
