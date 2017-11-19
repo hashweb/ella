@@ -21,6 +21,9 @@ RUN echo 'developer ALL=(ALL) NOPASSWD: ALL' >> /etc/sudoers
 # Set development environment
 ENV NODE_ENV development
 
+# For Google Chrome Node debugging
+EXPOSE 9229
+
 # Change to the developer user and its home folder and run the entry point script
 USER developer
 WORKDIR /ella

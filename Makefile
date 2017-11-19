@@ -8,6 +8,7 @@ docker-create:
     --name ella \
     --hostname ella \
     --volume ${PWD}:/ella \
+    --publish 9229:9229 \
     ella
 
 docker-sandbox: docker-build docker-create
