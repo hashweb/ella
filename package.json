@@ -7,7 +7,7 @@
   "license": "MIT",
   "repository": {
     "type": "git",
-    "url": "https://github.com/hashweb/ella2"
+    "url": "https://github.com/hashweb/ella"
   },
   "engines": {
     "node": ">=8.0.0"
