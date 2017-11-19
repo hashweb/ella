@@ -4,6 +4,7 @@
     "port": 6667,
     "user": "ella-development",
     "nick": "ella-dev",
+    "password": "",
     "channels": [
       "web-testing"
     ]
