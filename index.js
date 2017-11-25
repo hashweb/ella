@@ -233,7 +233,7 @@ async function seen(user, event) {
 async function fseen(user, event) {
   try {
     let response = await hashweb.fseen(user);
-    event.reply(`${event.nick}: ${res}`);
+    event.reply(`${event.nick}: ${response}`);
   } catch(err) {
     if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
