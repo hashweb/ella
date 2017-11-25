@@ -114,6 +114,23 @@ bot.on('privmsg', function(event) {
 });
 
 /**
+ * Get Help on the bot!
+ * @param {object} event - IRC.
+ * @return {Promise}
+ */
+function help(event) {
+  event.reply(`${event.nick} you can find out more about me here - ${package.repository.url}`);
+}
+
+/**
+ * Return a pong.
+ * @param {object} event - IRC.
+ */
+function ping(event) {
+  event.reply(`${event.nick} Pong`);
+}
+
+/**
  * Call Ops.
  * @param {object} event - IRC.
  */
@@ -178,33 +195,17 @@ async function stats(user, event) {
 }
 
 /**
- * Get Help on the bot!
- * @param {object} event - IRC.
- * @return {Promise}
- */
-function help(event) {
-  event.reply(`${event.nick} you can find out more about me here - ${package.repository.url}`);
-}
-
-/**
- * Return a pong.
- * @param {object} event - IRC.
- */
-function ping(event) {
-  event.reply(`${event.nick} Pong`);
-}
-
-/**
  * Search Google and return the first result
  * @param {string} search query - The query the user is searching for
  * @param {event} ircEevnt - The event object passed through
  */
-function searchGoogle(cmd, event) {
-  googleSearch(cmd).then((response) => {
+async function searchGoogle(cmd, event) {
+  try {
+    let response = await googleSearch(cmd);
     event.reply(`${event.nick}: ${response.title} - ${response.link}`);
-  }, (err) => {
-    logger.error(err.toString());
-  });
+  } catch(err) {
+    logger.error(err.toString())
+  }
 }
 
 /**
@@ -212,16 +213,16 @@ function searchGoogle(cmd, event) {
  * @param {string} search query - The query the user is searching for
  * @param {event} ircEevnt - The event object passed through
  */
-function seen(user, event) {
-  hashweb.seen(user).then(res => {
-    event.reply(`${event.nick}: ${res}`);
-  }, err => {
+async function seen(user, event) {
+  try {
+    let response = await hashweb.seen(user);
+    event.reply(`${event.nick}: ${response}`);
+  } catch(err) {
     if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
-      return;
     }
     logger.error(err);
-  });
+  }
 }
 
 /**
@@ -229,14 +230,15 @@ function seen(user, event) {
  * @param {string} search query - The query the user is searching for
  * @param {event} ircEevnt - The event object passed through
  */
-function fseen(user, event) {
-  hashweb.fseen(user).then(res => {
-    event.reply(`${event.nick}: ${res}`);
-  }, err => {
+async function fseen(user, event) {
+  try {
+    let response = await hashweb.fseen(user);
+    event.reply(`${event.nick}: ${response}`);
+  } catch(err) {
     if (err.message === 'User not found') {
       event.reply(`sorry ${event.nick}: I can't find that user :(`);
       return;
     }
     logger.error(err);
-  });
+  }
 }
