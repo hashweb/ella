@@ -61,6 +61,7 @@ bot.on('message', function(event) {
       break;
     case 'ops':
       ops(event);
+      break;
     case 'karma':
       giveKarma(command[1], event);
       break;
