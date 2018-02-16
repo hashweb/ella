@@ -20,15 +20,29 @@ bot.connect({
   username: config.get('irc.nick')
 });
 
-bot.on('registered', function() {
-  logger.info('Connected');
-  bot.say('nickserv', 'identify ' + config.get('irc.nick') + ' ' + config.get('irc.password'));
+bot.on('connected', function() {
+  console.log('Connected');
+  bot.say('nickserv', 'identify ' + config.get('irc.user') + ' ' + config.get('irc.password'));
 
-  let channels = config.get('irc.channels');
-  channels.forEach(v => {
-    bot.join(v);
-  });
 });
+
+bot.on('registered', function() {
+  console.log('Registered');
+  bot.say('nickserv', 'identify ' + config.get('irc.user') + ' ' + config.get('irc.password'));
+  setTimeout(function() {
+        // there is a long delay between identifying and actually getting identified
+        // #web won't let in without being identified
+        let channels = config.get('irc.channels');
+        channels.forEach(v => {
+                bot.join(v);
+        });
+        bot.changeNick(config.get('irc.user'));
+  }, 8000);
+});
+
+bot.on('raw', function(msg) {
+        console.log(msg);
+})
 
 let urlRegex = new RegExp('^(http[s]?:\\/\\/(www\\.)?|ftp:\\/\\/(www\\.)?|www\\.){1}([0-9A-Za-z-\\.@:%_+~#=]+)+((\\.[a-zA-Z]{2,3})+)(/(.)*)?(\\?(.)*)?');
 
